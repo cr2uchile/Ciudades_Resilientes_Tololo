@@ -97,7 +97,12 @@ def leer_ebas(inicio,fin):
     
     df = pd.DataFrame({ "O3_ppbv" : O3_ppbv, "O3_ppbv_std" : O3_ppbv_2 })
 
+    # Finding and removing dates (index) repeated 
     df = df.iloc[~df.index.duplicated(keep='first')]
+
+    # Resampling to 15 min values for to fill data not registered with nan
+    df = df.resample('15min').asfreq()
+
     
     return df                   
 
