@@ -49,8 +49,8 @@ def leer_ebas(inicio,fin):
 
     """
     orig = os.getcwd() #Says where the file is
-    #datadir=orig+'\\DATA\\DB-EBAS'
-    datadir=orig+'/Data'
+    datadir=orig+'\\DATA\\DB-EBAS'
+    #datadir=orig+'/Data'
 
     # print(datadir)
     # os.chdir(datadir)
@@ -189,8 +189,8 @@ def leer_dmc(inicio,fin,tipo):
 
     """
     orig = os.getcwd() #Says where the file is
-   #datadir=orig +'\\DATA\\DB-DMC'
-    datadir=orig +'/Data'
+    datadir=orig +'\\DATA\\DB-DMC'
+    #datadir=orig +'/Data'
 
     if inicio=='1997': 
         if tipo==118:
@@ -303,8 +303,8 @@ dfdmc_O3_RH_15m=dfold
 #Saving data frames
     
 orig = os.getcwd() #Says where the file is 
-#ruta=orig+'\\DATA\\'
-ruta=orig +'/Data'
+ruta=orig+'\\DATA\\'
+#ruta=orig +'/Data'
 
 #dfebas_O3H.to_csv(ruta+'EBAS-O3H-2013-2019')
 dfdmc_O3_RH_15m.to_csv(ruta+'/DMC-O3_RH_15m_dmc-1995-2012')
