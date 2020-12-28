@@ -49,8 +49,8 @@ def leer_ebas(inicio,fin):
 
     """
     orig = os.getcwd() #Says where the file is
-    datadir=orig+'\\DATA\\DB-EBAS'
-    #datadir=orig+'/Data'
+    datadir=orig+'\\DATA\\DB-EBAS\\'
+    #datadir=orig+'/Data/'
 
     # print(datadir)
     # os.chdir(datadir)
@@ -62,7 +62,7 @@ def leer_ebas(inicio,fin):
         name_data = 'CL0001R.'+inicio+'000000.20201102112043.uv_abs.ozone.air.1y.1h.CL01L_TEI49C_no72417371.CL01L_uv_abs.lev2.nas'
    
     tiempo = pd.date_range(inicio,fin, freq= 'H')                                   # Vectir de tiempo con los input de inicio y fin
-    input_data = pd.read_csv(datadir+'/'+ name_data,decimal=".", delimiter=r"\s+", header =76);  # lectura de datos
+    input_data = pd.read_csv(datadir+ name_data,decimal=".", delimiter=r"\s+", header =76);  # lectura de datos
     #Data structure
     #[8760 rows x 7 columns]>
     #starttime     endtime        O3    O3.1     O3.2   O3.3   flag
@@ -189,8 +189,8 @@ def leer_dmc(inicio,fin,tipo):
 
     """
     orig = os.getcwd() #Says where the file is
-    datadir=orig +'\\DATA\\DB-DMC'
-    #datadir=orig +'/Data'
+    datadir=orig +'\\DATA\\DB-DMC\\'
+    #datadir=orig +'/Data/'
 
     if inicio=='1997': 
         if tipo==118:
@@ -202,9 +202,9 @@ def leer_dmc(inicio,fin,tipo):
     
 #    print(name_data)
     if tipo==118:
-        input_data = pd.read_csv(datadir+'/'+ name_data,decimal=",", delimiter=r";", header =0, na_values= ['?' , 'c '])  # lectura de datos
+        input_data = pd.read_csv(datadir+ name_data,decimal=",", delimiter=r";", header =0, na_values= ['?' , 'c '])  # lectura de datos
     elif tipo==119:
-        input_data = pd.read_csv(datadir+'/'+ name_data,decimal=",", delimiter=r";", header =0, na_values= '?') 
+        input_data = pd.read_csv(datadir+ name_data,decimal=",", delimiter=r";", header =0, na_values= '?') 
         
     #Renaming column names
     if tipo==118:
