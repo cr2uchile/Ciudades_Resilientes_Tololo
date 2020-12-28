@@ -71,8 +71,8 @@ from info_Plotting import FSERIES
 # It consists of a dataframe containg hourly values of ozone and the corresponding 
 # standard deviation
 orig = os.getcwd() #Says where the file is
-fn=orig+'/Data/'+'DMC-O3_RH_15m_dmc-1995-2012'  # cambiar fn linea inferior
-#fn=orig+'\\DATA\\'+'DMC-O3_RH_15m_dmc-1995-2012'  
+#fn=orig+'/Data/'+'DMC-O3_RH_15m_dmc-1995-2012'  # cambiar fn linea inferior
+fn=orig+'\\DATA\\'+'DMC-O3_RH_15m_dmc-1995-2012'  
 
 df = pd.read_csv(fn,index_col=0,parse_dates=True) 
 #df.rename(columns = {'Unnamed: 0':'Date'}, inplace = True)
@@ -112,9 +112,8 @@ FSERIES('O3','DMC',df,1) #PENDING TIME AXES
 
 orig = os.getcwd() 
 
-#fn=orig+'\\DATA\\'+'DMC-O3_RH_15m_dmc-1995-2012_clear'
-
-fn=orig+'/Data/DMC-O3_RH_15m_dmc-1995-2012_clear'
+fn=orig+'\\DATA\\'+'DMC-O3_RH_15m_dmc-1995-2012_clear'
+#fn=orig+'/Data/DMC-O3_RH_15m_dmc-1995-2012_clear'
 df.to_csv(fn)
 
 
