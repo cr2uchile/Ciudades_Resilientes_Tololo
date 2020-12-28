@@ -11,6 +11,8 @@ This set corresponds to hourly averaged values
 
 Data for the period 1995-2013 was obtained from the Chilean Meteorological Office
 thanks to Dr. Carmen Vega (carmen.vega@dgac.gob.cl) and colleagues
+The ozone sensor was a TECO  49-003  analyzer
+https://www.eol.ucar.edu/instruments/thermo-environmental-instruments-model-49-ozone-analyzer
 
 """
 
@@ -39,7 +41,7 @@ def leer_ebas(inicio,fin):
           Reads either relative humidity or ozone in ppbv
     Returns
     -------
-    df : Dataframe
+    df : Dataframe containing O3 in ppbv and its standard deviation (hourly values)
         Archivo pandas Df con el año de lectura conteniendo O3 en mug/m3 y pbbv mas std obtenudas desde
         http://ebas.nilu.no/Pages/DataSetList.aspx?key=A4C1704036474C47AED6FA75E2A99882.
         El formato de los datos está descrito en NASA Ames 1001 format.: https://cloud1.arc.nasa.gov/solve/archiv/archive.tutorial.html
@@ -47,8 +49,8 @@ def leer_ebas(inicio,fin):
 
     """
     orig = os.getcwd() #Says where the file is
-    datadir=orig+'/Datos'    # Cambiar datadir
     #datadir=orig+'\\DATA\\DB-EBAS'
+    datadir=orig+'/Data'
 
     # print(datadir)
     # os.chdir(datadir)
@@ -60,7 +62,7 @@ def leer_ebas(inicio,fin):
         name_data = 'CL0001R.'+inicio+'000000.20201102112043.uv_abs.ozone.air.1y.1h.CL01L_TEI49C_no72417371.CL01L_uv_abs.lev2.nas'
    
     tiempo = pd.date_range(inicio,fin, freq= 'H')                                   # Vectir de tiempo con los input de inicio y fin
-    input_data = pd.read_csv(datadir+'\\'+ name_data,decimal=".", delimiter=r"\s+", header =76);  # lectura de datos
+    input_data = pd.read_csv(datadir+'/'+ name_data,decimal=".", delimiter=r"\s+", header =76);  # lectura de datos
     #Data structure
     #[8760 rows x 7 columns]>
     #starttime     endtime        O3    O3.1     O3.2   O3.3   flag
@@ -95,6 +97,7 @@ def leer_ebas(inicio,fin):
     
     df = pd.DataFrame({ "O3_ppbv" : O3_ppbv, "O3_ppbv_std" : O3_ppbv_2 })
 
+    df = df.iloc[~df.index.duplicated(keep='first')]
     
     return df                   
 
@@ -104,7 +107,7 @@ def leer_ebas(inicio,fin):
 #15 min averages on yearly files
 
 
-def leer_dmc(inicio,fin,tipo,filtro=True):
+def leer_dmc(inicio,fin,tipo):
     """    
     Parameters
     ----------
@@ -175,15 +178,15 @@ def leer_dmc(inicio,fin,tipo,filtro=True):
      
     Returns
     -------
-    df : Dataframe
+    df : Dataframe containing ozone in ppbv and relative humidity (15 min average)
         Archivo pandas Df con el año de lectura conteniendo O3 en mug/m3 y pbbv mas std obtenudas desde
         http://ebas.nilu.no/Pages/DataSetList.aspx?key=A4C1704036474C47AED6FA75E2A99882.
 
     """
     orig = os.getcwd() #Says where the file is
-    datadir=orig+'/Data'         # cambiar datadir
-    #datadir=orig+'\\DATA\\DB-EBAS'
-    
+   #datadir=orig +'\\DATA\\DB-DMC'
+    datadir=orig +'/Data'
+
     if inicio=='1997': 
         if tipo==118:
             name_data='ET'+inicio+'_1'+'.csv'
@@ -194,74 +197,71 @@ def leer_dmc(inicio,fin,tipo,filtro=True):
     
 #    print(name_data)
     if tipo==118:
-        input_data = pd.read_csv(datadir+'/'+ name_data,decimal=",", delimiter=r";", header =0)  # lectura de datos
+        input_data = pd.read_csv(datadir+'/'+ name_data,decimal=",", delimiter=r";", header =0, na_values= ['?' , 'c '])  # lectura de datos
     elif tipo==119:
-        input_data = pd.read_csv(datadir+'/'+ name_data, decimal=",", delimiter=r";",  header =0, na_values= '?') 
+        input_data = pd.read_csv(datadir+'/'+ name_data,decimal=",", delimiter=r";", header =0, na_values= '?') 
         
     #Renaming column names
     if tipo==118:
-        input_data = input_data.rename(columns={input_data.keys()[9]: "RH(%)",input_data.keys()[17]: "O3_ppbv"})                            
+        input_data = input_data.rename(columns={input_data.keys()[9]: "RH_perc",input_data.keys()[17]: "O3_ppbv"})                            
     elif tipo==119:
-        input_data = input_data.rename(columns={input_data.keys()[15]: "RH(%)",input_data.keys()[23]: "O3_ppbv"})
+        input_data = input_data.rename(columns={input_data.keys()[15]: "RH_perc",input_data.keys()[23]: "O3_ppbv"})
     
 #    input_data["RH(%)"].replace(-99999, np.nan, inplace=True)    
 #   input_data["O3_ppbv"].replace(6999, np.nan, inplace=True)  
     #Changing dates
         
     if tipo==118:
-        j=input_data['2']  # Julian Day
-        h_aux=input_data['3']
+        j = input_data['2']  # Julian Day
+        h_aux = input_data['3']
     elif tipo==119:
-        j=input_data['3']  # Julian Day
-        h_aux=input_data['4']
+        j = input_data['3']  # Julian Day
+        h_aux = input_data['4']
+        
+    # j = input_data[i_date]
+    # h = input_data[i_time]
+        
+    # Make 
+    fecha_str = [inicio +'-'+ str(d) for d in j]
+    fecha = pd.to_datetime(fecha_str, format='%Y-%j')
     
+    dhora_str = [str(hi // 100).zfill(2) + ':' + str(hi % 100).zfill(2) 
+                 + ':00' for hi in h_aux]
+    dhora = pd.to_timedelta(dhora_str)
     
-    h = list()
-    for i in h_aux:
-        #print(i)
-        if len(str(i)) < 3:
-            h.append('00'+str(i))
-        elif len(str(i)) < 4:
-            h.append('0'+str(i))
-        else:
-            h.append(str(i))
-            
-    h[h == '2400'] = '0000'
-           
-    vector_t=list()
+    tiempo = fecha + dhora
     
-    for i in range(h_aux.size):
-        if h[i]== '2400':
-            h[i]= '0000'
-        tiempo2=datetime.datetime.strptime(inicio +'-'+str(j[i])+'-'+h[i][0:2]+'-'+h[i][2:5], '%Y-%j-%H-%M')
-        vector_t.append(tiempo2)
-    
-    #From datetime to stamptime
-    
-    tiempo=pd.DatetimeIndex(vector_t)
+
+    # tiempo=pd.DatetimeIndex(vector_t)
     
     # Generar series indexadas con tiempo
     
     O3_ppbv = pd.Series(input_data["O3_ppbv"].values, index=tiempo)
-    RH_perc = pd.Series(input_data["RH(%)"].values, index=tiempo)
+    RH_perc = pd.Series(input_data["RH_perc"].values, index=tiempo)
 
         
     # Forma estructura dataframe final
         
    
     df = pd.DataFrame({ "O3_ppbv" : O3_ppbv, "RH_perc" : RH_perc })
-    
-    if filtro == True : 
-        df[df<df.quantile(0.01)] = np.nan
-        df[df>df.quantile(0.99)] = np.nan
    
-        df[df < 0] = np.nan
-        df.RH_perc[df.RH_perc > 100] = np.nan
+    # df[df < 0] = np.nan
+    # df.RH_perc[df.RH_perc > 100] = np.nan
+    # df.O3_ppbv[df.O3_ppbv > 500] = np.nan
     return df    
 
 ##################################################
+# Lectura usando funcion leer_ebas
 
-
+# df_2013 = leer_ebas('20130101','20140101')
+# df_2014 = leer_ebas('20140101','20150101')
+# df_2015 = leer_ebas('20150101','20160101')
+# df_2016 = leer_ebas('20160101','20170101')
+# df_2017 = leer_ebas('20170101','20180101')
+# df_2018 = leer_ebas('20180101','20190101')
+# df_2019 = leer_ebas('20190101','20200101')
+# # Concatena datos
+# dfebas_O3H = pd.concat( [ df_2013 ,  df_2014, df_2015 , df_2016 , df_2017, df_2018, df_2019])
 
 #Reading old data 1995-2012
 dfold = pd.DataFrame()
@@ -286,12 +286,6 @@ for i in range(1998,2013):
 dfdmc_O3_RH_15m=dfold
 
 
-orig = os.getcwd() 
-fn= orig+'/Data'   ## cambiar :  fn = orig+ '\\DATA\\'
-#fn = orig+ '\\DATA\\'
-dfdmc_O3_RH_15m.to_csv(fn+'/DMC-O3_RH_15m_dmc-1995-2012')
-    
-
 #Resampling
     
 # dfoldH1=dfold.resample('H').mean()
@@ -301,10 +295,14 @@ dfdmc_O3_RH_15m.to_csv(fn+'/DMC-O3_RH_15m_dmc-1995-2012')
 # dfold=pd.concat([dfold,dfoldH1.O3_ppbv],axis=0)
 # dfold=pd.concat([dfold,dfoldH2.O3_ppbv],axis=1)
 
-# #Saving data frames
+#Saving data frames
     
-# orig = os.getcwd() #Says where the file is
-# ruta=orig+'\\DATA\\'
-# df.to_csv(ruta+'O3-2013-2019')
-# #Otherwise: df.to_excel("output.xlsx") 
+orig = os.getcwd() #Says where the file is 
+#ruta=orig+'\\DATA\\'
+ruta=orig +'/Data'
+
+#dfebas_O3H.to_csv(ruta+'EBAS-O3H-2013-2019')
+dfdmc_O3_RH_15m.to_csv(ruta+'/DMC-O3_RH_15m_dmc-1995-2012')
+
+ #Otherwise: df.to_excel("output.xlsx") 
 
