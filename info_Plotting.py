@@ -43,7 +43,7 @@ def FHIST(spec,dbname,df,Nbins, ext=None):
     plt.rcParams['ytick.labelsize'] = 16
     
     if spec=='O3':
-        series=df.O3_ppbv
+        series=df.O3_ppbv   #[df.O3_ppbv.between(df.O3_ppbv.quantile(.01), df.O3_ppbv.quantile(.99))]
     elif spec=='RH':
         series=df.RH_perc
         
@@ -76,10 +76,13 @@ def FHIST(spec,dbname,df,Nbins, ext=None):
     
     ene=len(series)-np.sum(np.isnan(series))
        
-    # at = AnchoredText("N of bins "+str(Nbins)+"\n N of data points "+str(ene)+
-    #                    prop=dict(size=12), loc=1) 
+    ax=plt.subplot(111)
+    at = AnchoredText("N of bins "+str(Nbins)+"\n N of data points "+str(ene) + 
+                      "\n N of missing data points "+str(np.sum(np.isnan(series))) +
+                      "\n Mean: " + str(round(series.mean(),2)) + 
+                      "\n Std: " + str(round(series.std(),2)), prop=dict(size=12), loc=1) 
+    ax.add_artist(at)
     
-    # ax.add_artist(at)
     if ext ==None:
         ext='png'
                                            
@@ -95,8 +98,7 @@ def FHIST(spec,dbname,df,Nbins, ext=None):
 
 def FSERIES(spec,dbname,df,tipo, ext=None):
     '''
-    
-    
+  
     Parameters
     ----------
     spec : String indicating species, e.g., O3
@@ -132,7 +134,7 @@ def FSERIES(spec,dbname,df,tipo, ext=None):
     mino=0
     maxo=np.nanmax(series)
     
-    plt.plot(fechas,series)
+    plt.plot(series)
     plt.ylim([mino,maxo+10])
 #    plt.ylim(0,0.10)
 
@@ -144,9 +146,20 @@ def FSERIES(spec,dbname,df,tipo, ext=None):
         tit='Relative Humidity (%)'
         titu='Tololo (30°S, 70°W, 2151 m a.s.l.)'+' DB-'+dbname
     
+    
     titulo=titu+': '+'\n' +'from '+str(ini)+' to '+str(fin)
+    plt.title(titulo)
     plt.xlabel('Date',fontsize=18)
     plt.ylabel(tit,fontsize=18)
+    
+    ax=plt.subplot(111)
+    at = AnchoredText("Mean: " + str(round(series.mean(),2)) + 
+                      "\n Std: " + str(round(series.std(),2)) +
+                      "\n Trend 1: " + 'XX +/- YY ppbv/decada'+
+                      "\n Trend 2: " + 'XX +/- YY ppbv/decada' 
+                      , prop=dict(size=12), loc=1) 
+    ax.add_artist(at)
+    
     #plt.title(titulo, fontsize=20) 
     #    plt.tight_layout(rect=[0, 0.03,1,0.95]) 
     plt.show()   
