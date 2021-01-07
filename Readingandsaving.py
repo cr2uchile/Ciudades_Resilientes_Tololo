@@ -251,6 +251,9 @@ def leer_dmc(inicio,fin,tipo):
         
    
     df = pd.DataFrame({ "O3_ppbv" : O3_ppbv, "RH_perc" : RH_perc })
+    
+    # Finding and removing dates (index) repeated 
+    df = df.iloc[~df.index.duplicated(keep='first')]
    
     return df    
 
