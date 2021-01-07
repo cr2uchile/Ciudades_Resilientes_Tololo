@@ -277,6 +277,9 @@ for i in range(1998,2013):
     var=leer_dmc(str(i),str(i+1),119) 
     dfold = pd.concat([dfold,var])
 
+# Finding and removing dates (index) repeated 
+dfold = dfold.iloc[~dfold.index.duplicated(keep='first')] 
+    
 #Removing negative values
     
 dfold[dfold <0]=np.nan
