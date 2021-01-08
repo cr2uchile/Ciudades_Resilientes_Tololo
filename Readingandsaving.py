@@ -251,9 +251,6 @@ def leer_dmc(inicio,fin,tipo):
         
    
     df = pd.DataFrame({ "O3_ppbv" : O3_ppbv, "RH_perc" : RH_perc })
-    
-    # Finding and removing dates (index) repeated 
-    df = df.iloc[~df.index.duplicated(keep='first')]
    
     return df    
 
@@ -276,13 +273,15 @@ dfold = pd.concat([dfold,var])
 for i in range(1998,2013):
     var=leer_dmc(str(i),str(i+1),119) 
     dfold = pd.concat([dfold,var])
+var=leer_dmc('2013','2013',119).astype(float)
+dfold = pd.concat([dfold,var])
 
-# Finding and removing dates (index) repeated 
-dfold = dfold.iloc[~dfold.index.duplicated(keep='first')] 
-    
+# Finding and removing dates (index) repeated
+dfold = dfold.iloc[~dfold.index.duplicated(keep='first')]
+
 #Removing negative values
     
-dfold[dfold <0]=np.nan
+dfold[dfold <0] = np.nan
 
 dfdmc_O3_RH_15m=dfold
 
@@ -303,9 +302,7 @@ dfebas_O3H = pd.concat( [ df_2013 ,  df_2014, df_2015 , df_2016 , df_2017, df_20
 orig = os.getcwd() #Says where the file is 
 ruta=orig+'\\DATA\\'
 dfebas_O3H.to_csv(ruta+'EBAS-O3H-2013-2019'+'.csv')
-dfdmc_O3_RH_15m.to_csv(ruta+'/DMC-O3_RH_15m_dmc-1995-2012'+'.csv')
-
-# test
+dfdmc_O3_RH_15m.to_csv(ruta+'/DMC-O3_RH_15m_dmc-1995-2013'+'.csv')
 
 
 
