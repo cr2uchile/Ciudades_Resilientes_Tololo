@@ -136,7 +136,7 @@ def FHIST2(spec,dbname,df,Nbins, ext=None):
     kwargs = dict(histtype='stepfilled', alpha=0.3, density=True, bins=Nbins)
         
     ax1.hist(series, **kwargs)
-    ax1.axvline(5, color='r', label='Instrumental')
+    ax1.axvline(5, color='r', label='Instrument Limit Detection')
     ax1.axvline(65, color='blue', label='L.Gallardo Filter')
     ax1.axvline(series.mean() + 4*series.std(), color='teal', label='M.Schultz Filter')
     ax1.axvline(series.mean() - 4*series.std(), color='teal')
