@@ -74,7 +74,7 @@ FHIST('O3', 'EBAS', df, 50) #PENDING Anchored text
 # standard deviation
 orig = os.getcwd() #Says where the file is
 #fn=orig+'/Data/'+'DMC-O3_RH_15m_dmc-1995-2012'  # cambiar fn linea inferior
-fn = orig+'\\DATA\\'+'DMC-O3_RH_15m_dmc-1995-2013.csv'  
+fn = orig+'\\DATA\\'+'DMC-O3_RH_15m_dmc-1995-2013.csv'
 
 df = pd.read_csv(fn,index_col=0,parse_dates=True) 
 #df.rename(columns = {'Unnamed: 0':'Date'}, inplace = True)
@@ -86,6 +86,7 @@ df_orig_dmc = df  #Original time series, before cleansing
 FSERIES('O3', 'DMC', df, 1) #PENDING TIME AXES
 #FHIST('O3', 'DMC', df, 50)
 def clean_series_demo(Min, Max, df):
+    a = df.copy()
 # The ozone sensor was a TECO  49-003  analyzer, between 1995-2013
 # see Anet et al, 2017 doi:10.5194/acp-17-6477-2017 for details
 # https://www.eol.ucar.edu/instruments/thermo-environmental-instruments-model-49-ozone-analyzer
@@ -98,7 +99,7 @@ def clean_series_demo(Min, Max, df):
 
 #Removing values below detection limit or the assumed range of calibration, i.e. 5 ppbv
 
-    df.O3_ppbv[df.O3_ppbv < Min] = np.nan
+    a.O3_ppbv[df.O3_ppbv < Min] = np.nan
 
 # # WARNING
 # See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
@@ -109,10 +110,10 @@ def clean_series_demo(Min, Max, df):
 #The time series evidences calibration spikes. In lack of the record of dates of calibration, 
 # we remove values above 65 ppbv, considering the data distribution of EBAS hourly values
 
-    df.O3_ppbv[df.O3_ppbv > Max] = np.nan
-    FSERIES('O3', 'DMC', df, 1)
-    FHIST2('O3', 'DMC', df, 50)
-    series = df.O3_ppbv
+    a.O3_ppbv[df.O3_ppbv > Max] = np.nan
+    FSERIES('O3', 'DMC', a, 1)
+    FHIST2('O3', 'DMC', a, 50)
+    series = a.O3_ppbv
     mean = series.mean()
     std = series.std()
     return mean, std
@@ -123,7 +124,7 @@ def clean_series(Min, Max, df):
     df.O3_ppbv[df.O3_ppbv > Max] = np.nan
 
 
-clean_series(5, 100, df)
+
 FSERIES('O3', 'DMC', df, 1)
 FHIST2('O3', 'DMC', df, 50)
 #PENDING TIME AXES
