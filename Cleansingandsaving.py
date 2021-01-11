@@ -99,7 +99,7 @@ def clean_series_demo(Min, Max, df):
 
 #Removing values below detection limit or the assumed range of calibration, i.e. 5 ppbv
 
-    a.O3_ppbv[df.O3_ppbv < Min] = np.nan
+    a.O3_ppbv[a.O3_ppbv < Min] = np.nan
 
 # # WARNING
 # See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
@@ -110,7 +110,7 @@ def clean_series_demo(Min, Max, df):
 #The time series evidences calibration spikes. In lack of the record of dates of calibration, 
 # we remove values above 65 ppbv, considering the data distribution of EBAS hourly values
 
-    a.O3_ppbv[df.O3_ppbv > Max] = np.nan
+    a.O3_ppbv[a.O3_ppbv > Max] = np.nan
     FSERIES('O3', 'DMC', a, 1)
     FHIST2('O3', 'DMC', a, 50)
     series = a.O3_ppbv
