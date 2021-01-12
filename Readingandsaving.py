@@ -252,7 +252,7 @@ def leer_dmc(inicio,fin,tipo):
    
     df = pd.DataFrame({ "O3_ppbv" : O3_ppbv, "RH_perc" : RH_perc })
    
-    return df    
+    return df
 
 ############################READING AND SAVING##############
 #Reading DMC data 1995-2012
@@ -271,9 +271,9 @@ var=leer_dmc('1997','1998',119)
 dfold = pd.concat([dfold,var])
 #1998 on
 for i in range(1998,2013):
-    var=leer_dmc(str(i),str(i+1),119) 
+    var=leer_dmc(str(i),str(i+1),119)
     dfold = pd.concat([dfold,var])
-var=leer_dmc('2013','2013',119).astype(float)
+var = leer_dmc('2013','2013',119).astype(float)
 dfold = pd.concat([dfold,var])
 
 # Finding and removing dates (index) repeated
@@ -286,7 +286,8 @@ dfold[dfold < 0] = np.nan
 data_new_no_negative = len(dfold)
 clear_data_no_negative = data_new - data_new_no_negative
 all_clear_data = clear_data_no_negative + clear_data
-dfdmc_O3_RH_15m = dfold
+#Se re-indexan datos cada 15 minutos
+dfdmc_O3_RH_15m = dfold.resample('15min').mean()
 
 #Reading EBAS data 2013-2020
 df_2013 = leer_ebas('20130101','20140101')
@@ -297,7 +298,7 @@ df_2017 = leer_ebas('20170101','20180101')
 df_2018 = leer_ebas('20180101','20190101')
 df_2019 = leer_ebas('20190101','20200101')
 # Concatena datos
-dfebas_O3H = pd.concat( [ df_2013 ,  df_2014, df_2015 , df_2016 , df_2017, df_2018, df_2019])
+dfebas_O3H = pd.concat([ df_2013 ,  df_2014, df_2015 , df_2016 , df_2017, df_2018, df_2019])
 
 
 #Saving data frames

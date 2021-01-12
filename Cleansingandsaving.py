@@ -132,16 +132,15 @@ def clean_series(Min, Max, df):
 sum_first_filter = clean_series(5, 65, df)
 
 def clean_near(df, n, c):
-    df_2 = df[n-1:].copy()
-    df_res_15 = df.resample('15min').mean()
-    df_movil = df_res_15.rolling(window=n).mean()
+    df_2 = df[n:].copy()
+    df_movil = df.rolling(window=n).mean()
     first_hour = dt.strptime(str(df.index[0]),'%Y-%m-%d %H:%M:%S')
     last_hour = dt.strptime(str(df.index[-1]),'%Y-%m-%d %H:%M:%S')
-    first_hour_des = first_hour + (n-1)*datetime.timedelta(minutes=15)
-    last_hour_des = last_hour + (n-1)*datetime.timedelta(minutes=15)
+    first_hour_des = first_hour + (n)*datetime.timedelta(minutes=15)
+    last_hour_des = last_hour + (n)*datetime.timedelta(minutes=15)
     hour_mod = pd.date_range(str(first_hour_des),str(last_hour_des),freq = '15min')
-    df_mod = pd.DataFrame({'O3_ppbv':df_res_15.O3_ppbv.values}, index = hour_mod)
-    index_sup = np.abs(c*df_movil-df_mod) > 5 
+    df_mod = pd.DataFrame({'O3_ppbv': df.O3_ppbv.values}, index = hour_mod)
+    index_sup = np.abs(c*df_movil-df_mod) > 6.48 #std de df
     supr_dates = index_sup.sum()
     df_2[index_sup] = np.nan
     return [df_2, supr_dates]
