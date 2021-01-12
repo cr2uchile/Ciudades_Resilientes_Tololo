@@ -22,6 +22,9 @@ import matplotlib.pyplot as plt  # Plotting
 import os as os                  # Directory management
 import numpy as np               # Numerics
 import datetime
+from datetime import date
+from datetime import timedelta
+from datetime import datetime as dt
 import info_Plotting  #Import key settings for the following graphs and data
 # Libreria creada para definir las rutas y los string de los Modelos
 from info_Plotting import FHIST
@@ -118,11 +121,26 @@ def clean_series_demo(Min, Max, df):
     std = series.std()
     return mean, std
 
-
+# serie_prueba=pd.Series(df['O3_ppbv'][4:].values > 3*aux[3:-1].values, index=df.index[4:])
+#b = clean_series_demo(5, 65, df)[0] + 4*clean_series_demo(5, 65, df)[1]
 def clean_series(Min, Max, df):
     df.O3_ppbv[df.O3_ppbv < Min] = np.nan
     df.O3_ppbv[df.O3_ppbv > Max] = np.nan
+clean_series(5, 55, df)
 
+def clean_near(df, n, c):
+    df_2 = df[n-1:].copy()
+    df_res_15 = df.resample('15min').mean()
+    df_movil = df.rolling(window=n).mean()
+    first_hour = dt.strptime(str(df.index[0]),'%Y-%m-%d %H:%M:%S')
+    last_hour = dt.strptime(str(df.index[-1]),'%Y-%m-%d %H:%M:%S')
+    first_hour_des = first_hour + (n-1)*datetime.timedelta(minutes=15)
+    last_hour_des = last_hour + (n-1)*datetime.timedelta(minutes=15)
+    hour_mod = pd.date_range(str(first_hour_des),str(last_hour_des),freq = '15min')
+    df_mod = pd.DataFrame({'O3_ppbv':df_res_15.O3_ppbv.values}, index = hour_mod)
+    index_sup = c*df_movil-df_mod < 0
+    df_2[index_sup] = np.nan
+    return df_2
 
 
 FSERIES('O3', 'DMC', df, 1)
@@ -177,3 +195,5 @@ df.to_csv(fn)
 #Creating data series of hourly ozone and corresponding standard deviation
 
 # Edite una prueba
+#df.resample('15min').mean()
+#horas_aux=pd.date_range('1995-11-09 18:15:00','2013-04-24 15:15:00',freq = '15min') hora desfasada promedio movil en 15 min
