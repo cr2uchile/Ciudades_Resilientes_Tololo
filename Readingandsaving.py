@@ -277,13 +277,16 @@ var=leer_dmc('2013','2013',119).astype(float)
 dfold = pd.concat([dfold,var])
 
 # Finding and removing dates (index) repeated
+data_old = len(dfold)
 dfold = dfold.iloc[~dfold.index.duplicated(keep='first')]
-
+data_new = len(dfold)
+clear_data = data_old - data_new
 #Removing negative values
-    
-dfold[dfold <0] = np.nan
-
-dfdmc_O3_RH_15m=dfold
+dfold[dfold < 0] = np.nan
+data_new_no_negative = len(dfold)
+clear_data_no_negative = data_new - data_new_no_negative
+all_clear_data = clear_data_no_negative + clear_data
+dfdmc_O3_RH_15m = dfold
 
 #Reading EBAS data 2013-2020
 df_2013 = leer_ebas('20130101','20140101')
