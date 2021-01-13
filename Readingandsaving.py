@@ -216,7 +216,7 @@ def leer_dmc(inicio,fin,tipo):
         # In year 2013 the columns don't have labels
         if inicio=='2013':
             input_data = pd.read_csv(orig+'\\DATA\\DB-DMC\\'+'ET2013.csv', decimal=",", delimiter=r";", na_values= '?',header = None)
-            for i in range(30):
+            for i in range(31):
                 input_data = input_data.rename(columns={input_data.keys()[i]: str(i+1)})
     #Renaming column names
     if tipo==118:
