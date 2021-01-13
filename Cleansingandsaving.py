@@ -93,16 +93,18 @@ def clean_series_demo(Min, Max, df):
     Parameters
     ----------
     Min : float
-        DESCRIPTION.
+        Minimum value of ozone to filter.
     Max : float
-        DESCRIPTION.
+        Maximum value of ozone to filter.
     df : DataFrame
-        DESCRIPTION.
+        Contains the data of ozone measurements in Tololo station.
 
     Returns
     -------
-    None.
-
+    The function lets try some values to filter the time series of ozone in
+    Tololo station and compare with the instrument limit detection, M.Schultz
+    filter and J.Anet filter.
+    The function returns the mean and std of time series.
     """
     a = df.copy()
 # The ozone sensor was a TECO  49-003  analyzer, between 1995-2013
@@ -139,21 +141,20 @@ def clean_series_demo(Min, Max, df):
 b = clean_series_demo(5, 65, df)[1]
 def clean_series(Min, Max, df):
     """
-    
-
     Parameters
     ----------
     Min : float
-        DESCRIPTION.
+        Minimum value of ozone to filter.
     Max : float
-        DESCRIPTION.
+        Maximum value of ozone to filter.
     df : DataFrame
-        DESCRIPTION.
-
+        Contains the data of ozone measurements in Tololo station.
     Returns
     -------
     TYPE
-        DESCRIPTION.
+        The function apply a filter to the time series for values less than Min
+        and higher values than Max. The function returns the number of
+        filtered data.
 
     """
     inf = df.O3_ppbv < Min
