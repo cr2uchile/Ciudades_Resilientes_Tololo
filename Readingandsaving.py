@@ -204,20 +204,26 @@ def leer_dmc(inicio,fin,tipo):
             name_data='ET'+inicio+'_2'+'.csv'
     else:
         name_data='ET'+inicio+'.csv'
+        
+    
+        
 #The file contains strange characters    
 
     if tipo==118:
         input_data = pd.read_csv(datadir+ name_data,decimal=",", delimiter=r";", header =0, na_values= ['?' , 'c '])  # lectura de datos
     elif tipo==119:
-        input_data = pd.read_csv(datadir+ name_data,decimal=",", delimiter=r";", header =0, na_values= '?') 
-        
+        input_data = pd.read_csv(datadir+ name_data,decimal=",", delimiter=r";", header =0, na_values= '?')
+        # In year 2013 the columns don't have labels
+        if inicio=='2013':
+            input_data = pd.read_csv(orig+'\\DATA\\DB-DMC\\'+'ET2013.csv', decimal=",", delimiter=r";", na_values= '?',header = None)
+            for i in range(30):
+                input_data = input_data.rename(columns={input_data.keys()[i]: str(i+1)})
     #Renaming column names
     if tipo==118:
         input_data = input_data.rename(columns={input_data.keys()[9]: "RH_perc",input_data.keys()[17]: "O3_ppbv"})                            
     elif tipo==119:
         input_data = input_data.rename(columns={input_data.keys()[15]: "RH_perc",input_data.keys()[23]: "O3_ppbv"})
-    
-
+        
     #Changing dates
         
     if tipo==118:
@@ -273,6 +279,8 @@ dfold = pd.concat([dfold,var])
 for i in range(1998,2013):
     var=leer_dmc(str(i),str(i+1),119)
     dfold = pd.concat([dfold,var])
+
+#
 var = leer_dmc('2013','2013',119).astype(float)
 dfold = pd.concat([dfold,var])
 
