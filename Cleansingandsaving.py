@@ -89,6 +89,21 @@ df_orig_dmc = df  #Original time series, before cleansing
 FSERIES('O3', 'DMC', df, 1) #PENDING TIME AXES
 #FHIST('O3', 'DMC', df, 50)
 def clean_series_demo(Min, Max, df):
+    """
+    Parameters
+    ----------
+    Min : float
+        DESCRIPTION.
+    Max : float
+        DESCRIPTION.
+    df : DataFrame
+        DESCRIPTION.
+
+    Returns
+    -------
+    None.
+
+    """
     a = df.copy()
 # The ozone sensor was a TECO  49-003  analyzer, between 1995-2013
 # see Anet et al, 2017 doi:10.5194/acp-17-6477-2017 for details
@@ -121,29 +136,73 @@ def clean_series_demo(Min, Max, df):
     std = series.std()
     return mean, std
 
-# serie_prueba=pd.Series(df['O3_ppbv'][4:].values > 3*aux[3:-1].values, index=df.index[4:])
-#b = clean_series_demo(5, 65, df)[0] + 4*clean_series_demo(5, 65, df)[1]
+b = clean_series_demo(5, 65, df)[1]
 def clean_series(Min, Max, df):
+    """
+    
+
+    Parameters
+    ----------
+    Min : float
+        DESCRIPTION.
+    Max : float
+        DESCRIPTION.
+    df : DataFrame
+        DESCRIPTION.
+
+    Returns
+    -------
+    TYPE
+        DESCRIPTION.
+
+    """
     inf = df.O3_ppbv < Min
     df.O3_ppbv[inf] = np.nan
     sup = df.O3_ppbv > Max
     df.O3_ppbv[sup] = np.nan
     return inf.sum() + sup.sum()
+
 sum_first_filter = clean_series(5, 65, df)
 
-def clean_near(df, n, c):
-    df_2 = df[n:].copy()
+
+def clean_near(df, n, c, d):
+    """
+    
+
+    Parameters
+    ----------
+    df : Dataframe
+        DESCRIPTION.
+    n : int
+        DESCRIPTION.
+    c : float
+        DESCRIPTION.
+    d : float
+        DESCRIPTION.
+
+    Returns
+    -------
+    list
+        DESCRIPTION.
+
+    """
+
+    df_2 = df.copy()
     df_movil = df.rolling(window=n).mean()
-    first_hour = dt.strptime(str(df.index[0]),'%Y-%m-%d %H:%M:%S')
-    last_hour = dt.strptime(str(df.index[-1]),'%Y-%m-%d %H:%M:%S')
-    first_hour_des = first_hour + (n)*datetime.timedelta(minutes=15)
-    last_hour_des = last_hour + (n)*datetime.timedelta(minutes=15)
+    first_hour = dt.strptime(str(df_movil.index[0]),'%Y-%m-%d %H:%M:%S')
+    last_hour = dt.strptime(str(df_movil.index[-1]),'%Y-%m-%d %H:%M:%S')
+    first_hour_des = first_hour + datetime.timedelta(minutes=15)
+    last_hour_des = last_hour + datetime.timedelta(minutes=15)
     hour_mod = pd.date_range(str(first_hour_des),str(last_hour_des),freq = '15min')
-    df_mod = pd.DataFrame({'O3_ppbv': df.O3_ppbv.values}, index = hour_mod)
-    index_sup = np.abs(c*df_movil-df_mod) > 6.48 #std de df
-    supr_dates = index_sup.sum()
+    df_mod = pd.DataFrame({'O3_ppbv': df_movil.O3_ppbv.values}, index = hour_mod)
+    index_sup = np.abs((c*df_mod) - df_2) > b
     df_2[index_sup] = np.nan
-    return [df_2, supr_dates]
+    supr_date_1 = index_sup.sum()
+    #index_sup = (-c*df_mod) + df_2 > 0
+    #df_2[index_sup] = np.nan
+    supr_date_2 = index_sup.sum()
+
+    return [df_2, supr_date_1, supr_date_2]
 
 
 FSERIES('O3', 'DMC', df, 1)
