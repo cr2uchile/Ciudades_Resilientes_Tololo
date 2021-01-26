@@ -291,6 +291,10 @@ data_new = len(dfold)
 clear_data = data_old - data_new
 #Removing negative values
 dfold[dfold < 0] = np.nan
+#Removing values under 1%
+dfold[dfold < dfold.quantile(0.01)[0]] = np.nan
+#Removing values over 99%
+dfold[dfold > dfold.quantile(0.99)[0]] = np.nan
 data_new_no_negative = len(dfold)
 clear_data_no_negative = data_new - data_new_no_negative
 all_clear_data = clear_data_no_negative + clear_data
@@ -314,7 +318,7 @@ dfebas_O3H = pd.concat([ df_2013 ,  df_2014, df_2015 , df_2016 , df_2017, df_201
 orig = os.getcwd() #Says where the file is 
 ruta=orig+'\\DATA\\'
 dfebas_O3H.to_csv(ruta+'EBAS-O3H-2013-2019'+'.csv')
-dfdmc_O3_RH_15m.to_csv(ruta+'/DMC-O3_RH_15m_dmc-1995-2013'+'.csv')
+dfdmc_O3_RH_15m.to_csv(ruta+'DMC-O3_RH_15m_dmc-1995-2013'+'.csv')
 
 
 

@@ -137,8 +137,11 @@ def clean_series_demo(Min, Max, df):
     mean = series.mean()
     std = series.std()
     return mean, std
-
-b = clean_series_demo(5, 65, df)[1]
+#limites de limpieza
+mean_df = df.mean()[0]
+std_df = df.std()[0]
+min_filter = mean_df - 4*std_df
+max_filter = mean_df + 4*std_df
 def clean_series(Min, Max, df):
     """
     Parameters
@@ -162,13 +165,12 @@ def clean_series(Min, Max, df):
     sup = df.O3_ppbv > Max
     df.O3_ppbv[sup] = np.nan
     return inf.sum() + sup.sum()
+clean_series(min_filter, max_filter, df)
+#sum_first_filter = clean_series(5, 65, df)
 
-sum_first_filter = clean_series(5, 65, df)
 
-
-def clean_near(df, n, c, d):
+def clean_near(df, n, c):
     """
-    
 
     Parameters
     ----------
@@ -190,22 +192,33 @@ def clean_near(df, n, c, d):
 
     df_2 = df.copy()
     df_movil = df.rolling(window=n).mean()
-    first_hour = dt.strptime(str(df_movil.index[0]),'%Y-%m-%d %H:%M:%S')
-    last_hour = dt.strptime(str(df_movil.index[-1]),'%Y-%m-%d %H:%M:%S')
+    first_hour = dt.strptime(str(df_movil.index[0]), '%Y-%m-%d %H:%M:%S')
+    last_hour = dt.strptime(str(df_movil.index[-1]), '%Y-%m-%d %H:%M:%S')
     first_hour_des = first_hour + datetime.timedelta(minutes=15)
     last_hour_des = last_hour + datetime.timedelta(minutes=15)
-    hour_mod = pd.date_range(str(first_hour_des),str(last_hour_des),freq = '15min')
-    df_mod = pd.DataFrame({'O3_ppbv': df_movil.O3_ppbv.values}, index = hour_mod)
-    index_sup = np.abs((c*df_mod) - df_2) > b
+    hour_mod = pd.date_range(str(first_hour_des), str(last_hour_des),
+                             freq='15min')
+    df_mod = pd.DataFrame({'O3_ppbv': df_movil.O3_ppbv.values}, index=hour_mod)
+    index_sup = (c*df_mod) - df < 0
     df_2[index_sup] = np.nan
     supr_date_1 = index_sup.sum()
-    #index_sup = (-c*df_mod) + df_2 > 0
-    #df_2[index_sup] = np.nan
+    index_sup = ((c-1)*df_mod) - df > 0
+    df_2[index_sup] = np.nan
     supr_date_2 = index_sup.sum()
 
     return [df_2, supr_date_1, supr_date_2]
+df = clean_near(df, 2 , 1.5)[0]
 
-
+# función que permite calcular las medias horarias para un intervalo con
+# una cierta cantidad de datos
+# def completitud(df, n, frec):
+#     bad_mean = np.isnan(df.O3_ppbv).astype(int).resample(frec).sum()
+#     m = np.isnan(df.O3_ppbv).astype(int).resample(frec).sum().max()
+#     good_mean = bad_mean > m-n
+#     count_bad = good_mean.sum()
+#     df_hourly = df.resample(frec).mean()
+#     df_hourly[good_mean] = np.nan
+#     return [df_hourly, count_bad]
 FSERIES('O3', 'DMC', df, 1)
 FHIST2('O3', 'DMC', df, 50)
 #PENDING TIME AXES
@@ -213,7 +226,7 @@ FHIST2('O3', 'DMC', df, 50)
 #df.O3_ppbv[df.O3_ppbv <5] = np.nan
 orig = os.getcwd()
 
-fn=orig+'\\DATA\\'+'DMC-O3_RH_15m_dmc-1995-2013_clear.csv'
+fn=orig+'\\DATA\\+'DMC-O3_RH_15m_dmc-1995-2013_clear.csv'
 #fn=orig+'/Data/DMC-O3_RH_15m_dmc-1995-2012_clear'
 df.to_csv(fn)
 
