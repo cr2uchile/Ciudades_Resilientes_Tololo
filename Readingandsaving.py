@@ -24,6 +24,7 @@ import matplotlib.pyplot as plt  # Plotting
 import os as os                  # Directory management    
 import numpy as np               # Numerics   
 import datetime
+from pathlib import Path
 
 #Reading data downloaded from  http://ebas.nilu.no/
 #Hourly averages
@@ -292,9 +293,11 @@ clear_data = data_old - data_new
 #Removing negative values
 dfold[dfold < 0] = np.nan
 #Removing values under 1%
-dfold[dfold < dfold.quantile(0.01)[0]] = np.nan
+#dfold[dfold < dfold.quantile(0.01)[0]] = np.nan
 #Removing values over 99%
-dfold[dfold > dfold.quantile(0.99)[0]] = np.nan
+#dfold[dfold > dfold.quantile(0.99)[0]] = np.nan
+#Removing values over 1000
+dfold[dfold>1000] = np.nan
 data_new_no_negative = len(dfold)
 clear_data_no_negative = data_new - data_new_no_negative
 all_clear_data = clear_data_no_negative + clear_data

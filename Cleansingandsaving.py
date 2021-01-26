@@ -30,7 +30,7 @@ import info_Plotting  #Import key settings for the following graphs and data
 from info_Plotting import FHIST
 from info_Plotting import FHIST2
 from info_Plotting import FSERIES
-
+from pathlib import Path
 
 
 
@@ -165,7 +165,7 @@ def clean_series(Min, Max, df):
     sup = df.O3_ppbv > Max
     df.O3_ppbv[sup] = np.nan
     return inf.sum() + sup.sum()
-clean_series(min_filter, max_filter, df)
+#clean_series(min_filter, max_filter, df)
 #sum_first_filter = clean_series(5, 65, df)
 
 
@@ -207,26 +207,30 @@ def clean_near(df, n, c):
     supr_date_2 = index_sup.sum()
 
     return [df_2, supr_date_1, supr_date_2]
-df = clean_near(df, 2 , 1.5)[0]
-
+df = clean_near(df, 3 , 1.5)[0]
 # función que permite calcular las medias horarias para un intervalo con
 # una cierta cantidad de datos
-# def completitud(df, n, frec):
-#     bad_mean = np.isnan(df.O3_ppbv).astype(int).resample(frec).sum()
-#     m = np.isnan(df.O3_ppbv).astype(int).resample(frec).sum().max()
-#     good_mean = bad_mean > m-n
-#     count_bad = good_mean.sum()
-#     df_hourly = df.resample(frec).mean()
-#     df_hourly[good_mean] = np.nan
-#     return [df_hourly, count_bad]
+def completitud(df, n, frec):
+     bad_mean = np.isnan(df.O3_ppbv).astype(int).resample(frec).sum()
+     m = np.isnan(df.O3_ppbv).astype(int).resample(frec).sum().max()
+     good_mean = bad_mean > m-n
+     count_bad = good_mean.sum()
+     df_hourly = df.resample(frec).mean()
+     df_hourly[good_mean] = np.nan
+     return [df_hourly, count_bad]
+# Data frame que permite ver los cambios para el cálculo de promedios horarios
+# con 3 o mas mediciones en una hora     
+df2 = completitud(df,3,'H')[0].O3_ppbv 
 FSERIES('O3', 'DMC', df, 1)
-FHIST2('O3', 'DMC', df, 50)
+#grafico del dataframe mencionado anteriormente
+FSERIES('O3', 'DMC', df2, 1)
+#FHIST2('O3', 'DMC', df, 50)
 #PENDING TIME AXES
 
 #df.O3_ppbv[df.O3_ppbv <5] = np.nan
 orig = os.getcwd()
 
-fn=orig+'\\DATA\\+'DMC-O3_RH_15m_dmc-1995-2013_clear.csv'
+fn=orig+'\\DATA\\'+'DMC-O3_RH_15m_dmc-1995-2013_clear.csv'
 #fn=orig+'/Data/DMC-O3_RH_15m_dmc-1995-2012_clear'
 df.to_csv(fn)
 
