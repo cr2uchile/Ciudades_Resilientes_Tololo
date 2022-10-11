@@ -24,7 +24,7 @@ import matplotlib.pyplot as plt  # Plotting
 import os as os                  # Directory management    
 import numpy as np               # Numerics   
 import datetime                  # Libraries to time
-from pathlib import Path
+from pathlib import Path         # Libraries to path
 
 #Reading data downloaded from  http://ebas.nilu.no/
 #Hourly averages
